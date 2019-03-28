@@ -1,0 +1,10 @@
+## General
+
+# Compiled python
+
+*.pyc
+
+
+# PyCharm files
+
+.idea

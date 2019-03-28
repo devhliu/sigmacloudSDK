@@ -98,8 +98,11 @@ $$QUERY_STRING = "KEY1=VALUE1" + "&" + "KEY2=VALUE2"$$
 https://github.com/
 
 ### Python 接入工具
-https://github.com/
+https://github.com/yuzhao12sigma/sigmacloudSDK
 
+---
+## **接入流程图**
+![](flow.png)
 ---
 
 ## **API参考**
@@ -181,7 +184,8 @@ API是HTTP API。常用的编程语言都能发起HTTP请求（通过第三方�
 ---
 
 ### API概览
-###关于login/logout的操作
+
+### 关于login/logout的操作
 |API|描述| 
 |:--|:--|
 |Login|登入，会返回token,用于鉴权|
@@ -190,8 +194,8 @@ API是HTTP API。常用的编程语言都能发起HTTP请求（通过第三方�
 ### 关于store的操作
 |API|描述| 
 |:--|:--|
-|Upload|上传文件，上传一组dcm需要先调用POST方法，后调用PUT方法|
-|DownloadFile|下载文件，可以下载单张图片或json结果|
+|Upload|上传文件，上传一组dcm分2步：1.先调用POST方法，2.调用PUT方法|
+|DownloadFile|下载文件，用于下载json文件（ai检测结果）|
 
 ### 关于job的操作  
 |API|描述|
@@ -200,6 +204,11 @@ API是HTTP API。常用的编程语言都能发起HTTP请求（通过第三方�
 |GetJob|获取job信息|
 |ListJobs|获取job信息列表|
 |GetJobStudyList|获取studylist|
+
+### 结果显示页
+|API|描述|
+|:--|:--|
+|view|通过浏览器查看检测结果，结节情况等信息|
 
 
 ### 关于login/logout的操作
@@ -219,10 +228,10 @@ API是HTTP API。常用的编程语言都能发起HTTP请求（通过第三方�
 ##### 请求参数
 |参数名|类型|是否必选|参数说明| 
 |:--|:--|:--|:--|
-|account_name|字符串|账户名|
-|user_name|字符串|用户名|
-|password|字符串|密码| 
-|force_new|字符串|是否强制登录，清除session，默认值是False|
+|account_name|字符串|必选|账户名|
+|user_name|字符串|必选|用户名|
+|password|字符串|必选|密码| 
+|force_new|字符串|必选|是否强制登录，踢session，默认值"False"|
 
 ##### 返回值示例
 ###### 请求成功返回示例
@@ -309,7 +318,7 @@ Header:
 ##### 请求头
 |Header名|是否必选|参数说明| 
 |:--|:--|:--|
-|Sigma-Token|否|登录接口返回的token信息|
+|Sigma-Token|必选|登录接口返回的token信息|
 
 ##### 返回值示例
 ###### 请求成功返回示例
@@ -355,7 +364,8 @@ Header:
 #### Upload（POST）
 #####  描述
 ```
-    批量上传dicom文件，需要先调用POST方法，获得upload_id
+    检测所需要的数据一般要求是薄层dicom图，每个series一般有百余张dicom图像，
+    批量上传dicom文件，第一步是调用POST方法，获得upload_id
 ```
 ##### 文件要求
 ```
@@ -363,7 +373,8 @@ Header:
 ```
 ##### 调用url
 ```
-    https://api.12sigma.ai/accounts/<res_account_name>/store/uploads/<filename>/
+    https://api.12sigma.ai/accounts/<res_account_name>/store/uploads/<groupname>/
+    提示：这个groupname要求是series_id
 ```
 ##### 调用方法
 ```
@@ -372,10 +383,10 @@ Header:
 ##### 请求参数
 |参数名|类型|是否必选|参数说明| 
 |:--|:--|:--|:--|
-|dirname|字符串|必选||
-|quantity|字符串|必选|默认1|
-|converted|字符串|必选|是否需要把dcm转nii，默认1|
-|overwrite|字符串|可选|是否覆盖同名文件，默认1|
+|groupname|字符串|必选|要求是series_id,来标识这组dcm图|
+|quantity|字符串|必选|要求是这个series的dcm实际总数，例如"200"|
+|converted|字符串|必选|是否dcm转nii，需要写"1"|
+|overwrite|字符串|必选|是否覆盖同名文件，需要写"1"|
 
 
 ##### 返回值示例
@@ -425,7 +436,7 @@ Header:
 #### Upload（PUT）
 #####  描述
 ```
-    Upload用于上传单个文件
+    Upload用于上传单个dcm文件，每个PUT请求上传一张dcm，因此你需要多次调用PUT上传
 ```
 ##### 文件要求
 ```
@@ -443,18 +454,15 @@ Header:
 ##### 请求Header
 |Header名|是否必选|参数说明| 
 |:--|:--|:--|
-|Sigma-Token|否|登录接口返回的token信息|
-|Content-Length|是|文件大小|
-|Content-MD5|是|文件的md5值|
+|Sigma-Token|必选|登录接口返回的token信息|
+|Content-Length|必选|文件大小|
+|Content-MD5|必选|文件的md5值|
 
 ##### 请求参数
 |参数名|类型|是否必选|参数说明| 
 |:--|:--|:--|:--|
 |filename|字符串|必选|文件名|
-|upload_id|字符串|可选|上传dcm文件是必须传此参数，值为POST Upload返回的upload_id|
-|overwrite|字符串|可选|上传dcm时需不要传，是否覆盖同名文件，默认1|
-|converted|字符串|可选|上传dcm时需不要传，是否需要把dcm转nii，默认1|
-|extension|字符串|可选|上传dcm时需不要传，文件扩展名|
+|upload_id|字符串|必选|此值为POST上传返回的upload_id|
 
 
 ##### 返回值示例
@@ -526,8 +534,6 @@ Header:
 |名称|类型|是否必须|描述| 
 |:--|:--|:--|:--|
 |filename|字符串|必选|文件名|
-|group_name|字符串|可选|组名，根据情况，取值series_id, 或study_id|
-|owner|字符串|可选|文件所有者，可以是用户名username|
 
 
 ##### 返回值示例
@@ -588,6 +594,10 @@ Header:
 |job_type|字符串|是|计算job的类型，例如：肺结节检测（lung_nodule_detection）|
 |priority|字符串|是|优先级，默认传 2|
 |type|字符串|是|默认写“file”|
+|notify|字符串|否|是否在计算成功后通知调用方，"1"表示通知，"0"表示不通知|
+|notify_url|字符串|否|如果notify参数是"1"，则此参数需要填写，例如："http://xxx/"|
+|notify_info|字典|否|如果有额外信息需要传入，可以写在这里|
+
 
 ##### 返回值示例
 ###### 请求成功返回示例
@@ -972,11 +982,24 @@ Content-MD5: Hmsgfyq30dPUcQw3SByXwg==
 Content-Length: 1611
 Server: Werkzeug/0.12.2 Python/2.7.6
 ```
----
 
-
-
-
-
-
+### 关于结果显示
+#### View
+##### 描述
+```
+    View用于在浏览器上看ai诊断结果
+```
+##### 调用url
+```
+    https://api.12sigma.ai/#home/patient/<token>/<series_id>"
+```
+##### 调用方法
+```
+    GET
+```
+##### 请求参数
+|参数名|类型|是否必选|参数说明| 
+|:--|:--|:--|:--|
+|token|字符串|必选|登录后得到的token|
+|series_id|字符串|必选|检测的序列号|
 

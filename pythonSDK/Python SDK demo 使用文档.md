@@ -27,16 +27,8 @@
 
 ### 第三步：开始调用API
 ```
-    1.选择PythonSDK文件夹，选择sigmacloud.py文件，填写API_KEY和API_SECRET；
-    2.打开call.py文件，运行其中的逻辑
+    打开call.py文件，运行其中的逻辑
+    （如果鉴权方式用“请求签名”,则填写API_KEY和API_SECRET)
+     (如果鉴权方式用“token”，则登录)
 ```
-
-### API_KEY和API_SECRET获取方式：
-```
-
-```
-
-
-
-
 
