@@ -991,7 +991,7 @@ Server: Werkzeug/0.12.2 Python/2.7.6
 ```
 ##### 调用url
 ```
-    https://api.12sigma.ai/#home/patient/<token>/<series_id>"
+    https://api.12sigma.ai/#home/patient/<account_name>/<token>/<series_id>"
 ```
 ##### 调用方法
 ```
@@ -1000,6 +1000,7 @@ Server: Werkzeug/0.12.2 Python/2.7.6
 ##### 请求参数
 |参数名|类型|是否必选|参数说明| 
 |:--|:--|:--|:--|
+|account_name|字符串|必选|账户名|
 |token|字符串|必选|登录后得到的token|
 |series_id|字符串|必选|检测的序列号|
 
