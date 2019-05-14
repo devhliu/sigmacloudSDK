@@ -167,6 +167,15 @@
 |overwrite|字符串|必选|是否覆盖同名文件，需要写"1"|
 
 
+##### 请求数据范例
+```
+    groupname=series_id,
+    quantity=1,
+    overwrite=1,
+    converted=1
+```
+
+
 ##### 返回值示例
 ###### 请求成功返回示例
 ```
@@ -305,6 +314,21 @@
 |notify_url|字符串|否|如果notify参数是"1"，则此参数需要填写，例如："http://xxx/"|
 |notify_info|字典|否|如果有额外信息需要传入，可以写在这里|
 
+##### 请求数据json范例
+```
+    request_data = {
+        'account_name': 'accunt_1',
+        'user_name': 'user_1',
+        'study_id': '11111.11111.11111',
+        'series_id': '222.222.222',
+        'patient_id': '622747',
+        'format': 'dcm',
+        'filename': '222.222.222.dcm',
+        'job_type': 'lung_dr_detection',
+        'priority': '2',
+        'type': 'file'
+    }
+```
 
 ##### 返回值示例
 ###### 请求成功返回示例
